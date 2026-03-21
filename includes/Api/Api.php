@@ -5,7 +5,7 @@ namespace GesimaticStaticForms\Api;
 // Prevent direct access 
 if ( ! defined( 'ABSPATH' ) ) {exit;} ;
 
-use Gesimatic\Core\Setup;
+use GesimaticStaticForms\Core\Setup;
 
 /**
  * Class Api

@@ -20,6 +20,15 @@ class Setup {
     }
 
     /**
+     * Activate plugin function.
+     *
+     * @return void
+     */
+    public static function activate(): void {
+    
+    }
+
+    /**
      * Delete plugin components.
      *
      * @return void

@@ -1,0 +1,32 @@
+{
+    "apiVersion": 3,
+    "name": "gesimatic-/user-register",
+    "title": "User Register",
+    "category": "widgets",
+    "icon": "forms",
+    "description": "Register form for Wordpress users",
+    "version": "1.0.0",
+    "textdomain": "gesimatic-static-forms",
+    "editorScript": "file:./build/index.js",
+    "style": "gesimatic-member-register-style",
+    "editorStyle": "gesimatic-member-register-editor-style",
+
+     "attributes": {
+        "formId": {
+            "type": "string",
+            "default": ""
+        },
+        "showName": {
+            "type": "boolean",
+            "default": true
+        },
+        "showEmail": {
+            "type": "boolean",
+            "default": true
+        },
+        "redirectUrl": {
+            "type": "string",
+            "default": ""
+        }
+    }
+}

@@ -33,11 +33,11 @@ defined( 'ABSPATH' ) || exit; // To prevent direct access
  * @const string GESIMATIC_STATIC_FORMS_URL       Absolute URL to the plugin directory.
  * @const int    GESIMATIC_STATIC_FORMS_VERSION   Plugin version.
  */
-define ('GSMTC_STATIC_FORMS_PATH',plugin_dir_path(__FILE__));
+define ('GESIMATIC_STATIC_FORMS_PATH',plugin_dir_path(__FILE__));
 if (function_exists('is_multisite') && is_multisite()) {
-    define ('GSMTC_STATIC_FORMS_URL',esc_url( network_site_url()).'wp-content/plugins/gesimatic-static-forms/');
-} else { define ('GSMTC_STATIC_FORMS_URL',home_url('/wp-content/plugins/gesimatic-static-forms/')); }
-define ('GSMTC_STATIC_FORMS_VERSION',425);
+    define ('GESIMATIC_STATIC_FORMS_URL',esc_url( network_site_url()).'wp-content/plugins/gesimatic-static-forms/');
+} else { define ('GESIMATIC_STATIC_FORMS_URL',home_url('/wp-content/plugins/gesimatic-static-forms/')); }
+define ('GESIMATIC_STATIC_FORMS_VERSION',425);
 
 /**
  * Loads the Composer autoloader for the plugin.
@@ -52,8 +52,8 @@ define ('GSMTC_STATIC_FORMS_VERSION',425);
  * Autoload dependencies either via Composer or manually.
 */
 
-if (file_exists(GSMTC_STATIC_FORMS_PATH . 'vendor/autoload.php')) {
-    require_once GSMTC_STATIC_FORMS_PATH . 'vendor/autoload.php';
+if (file_exists(GESIMATIC_STATIC_FORMS_PATH . 'vendor/autoload.php')) {
+    require_once GESIMATIC_STATIC_FORMS_PATH . 'vendor/autoload.php';
 } else {
     /**
      * Basic PSR-4 compliant autoloader.
@@ -63,7 +63,7 @@ if (file_exists(GSMTC_STATIC_FORMS_PATH . 'vendor/autoload.php')) {
     */
     spl_autoload_register(function ($class) {
         $prefix = 'GesimaticStaticForms\\';
-        $base_dir = GSMTC_STATIC_FORMS_PATH . 'includes/';
+        $base_dir = GESIMATIC_STATIC_FORMS_PATH . 'includes/';
         $len = strlen($prefix);
         if (strncmp($prefix, $class, $len) !== 0) {
             return;
@@ -100,7 +100,7 @@ register_activation_hook(__FILE__,'gesimatic_static_forms_activate');
 
 function gesimatic_static_forms_activate($network_wide){
     // Check if gesimatic is active
-    if (!is_plugin_active('gesimatic/index.php')) {
+    if (!is_plugin_active('gesimatic/gesimatic.php')) {
         // If gesimatic is not active, show to the user a message.
         deactivate_plugins('gesimatic-server/index.php');
         wp_die(__('This plugin requires the Gesimatic plugin to be activated !!!  Please install and activate Gesimatic to use this plugin.','gsmtc-server'));
@@ -113,7 +113,7 @@ function gesimatic_static_forms_activate($network_wide){
             restore_current_blog();
         }
     } else {
-        gsmtc_server_single_site_setup();
+        gesimatic_static_forms_single_site_setup();
     }
 }
 

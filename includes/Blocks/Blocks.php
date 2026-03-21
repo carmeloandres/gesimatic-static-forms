@@ -31,11 +31,20 @@ class Blocks {
     /**
 	 * registers the blocks and block assets 
 	 * 
-	 * This method registers the Gesimatic server Blocks and the necesary assets to work.
+	 * This method registers the Gesimatic Static Forms Blocks and the necesary assets to work.
 	 *
 	 * @return void
 	 */
     function register_blocks(){
-         register_block_type(GESIMATIC_STATIC_FORMS_PATH. '/Blocks/member-register');
+
+    error_log ('Blocks::register_blocks() executed, $params: ');//.var_export($params,true));
+        wp_register_script(
+            'gesimatic-user-register-editor',
+            GESIMATIC_STATIC_FORMS_PATH.'blocks/user-register/build/index.js',
+            [],
+            GESIMATIC_STATIC_FORMS_VERSION
+        );
+
+        register_block_type(GESIMATIC_STATIC_FORMS_PATH. '/blocks/user-register');
     }
 }
