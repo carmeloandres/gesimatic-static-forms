@@ -1,0 +1,21 @@
+{
+    "name": "gesimatic-static/forms",
+    "description": "This plugin provide some static forms to use as a block or a shortcodes and their ows functionality.",
+    "type": "wordpress-plugin",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Carmelo Andrés",
+            "email": "info@carmeloandres.com",
+            "homepage": "https://carmeloandres.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "GesimaticStaticForms\\": "includes/"
+        }
+    },
+    "require": {}
+}
