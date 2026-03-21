@@ -2,6 +2,8 @@ import { __ }from '@wordpress/i18n'
 import { registerBlockType } from '@wordpress/blocks';
 import block from '../block.json'
 
+import './index.scss';
+
 /**
  * Internal dependencies
  */

@@ -1,6 +1,6 @@
 {
     "apiVersion": 3,
-    "name": "gesimatic-/user-register",
+    "name": "gesimatic-static-forms/user-register",
     "title": "User Register",
     "category": "widgets",
     "icon": "forms",
@@ -9,20 +9,40 @@
     "textdomain": "gesimatic-static-forms",
     "editorScript": "file:./build/index.js",
     "style": "gesimatic-member-register-style",
-    "editorStyle": "gesimatic-member-register-editor-style",
+    "editorStyle": "file:./build/index.css",
 
      "attributes": {
         "formId": {
             "type": "string",
             "default": ""
         },
+        "showTitle": {
+            "type": "boolean",
+            "default": true
+        },
+        "title": {
+            "type": "string",
+            "default": "User register form"
+        },
         "showName": {
             "type": "boolean",
             "default": true
         },
+        "nameLabel": {
+            "type": "string",
+            "default": "User name"
+        },
         "showEmail": {
             "type": "boolean",
             "default": true
+        },
+        "emailLabel": {
+            "type": "string",
+            "default": "User email"
+        },
+        "buttonLabel": {
+            "type": "string",
+            "default": "Register"
         },
         "redirectUrl": {
             "type": "string",

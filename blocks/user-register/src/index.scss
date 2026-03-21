@@ -1,0 +1,113 @@
+.wp-block-gesimatic-static-forms-user-register{
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+
+    // Borde sutil 
+    border: 1px solid #e5e7eb;
+
+    // Sombra elegante (no agresiva) 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    // 👇 CLAVE PARA MÓVIL
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+
+    /* Transición suave (opcional, pero da sensación premium) */
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+
+    /* Efecto hover (muy útil si el formulario es interactivo) */
+    &:hover {
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .gesimatic-form__title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 20px;
+    }
+    
+    .gesimatic-form__input {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+
+        font-size: 0.95rem;
+        color: #1f2933;
+
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+
+        outline: none;
+
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        &::placeholder {
+            color: #9ca3af;
+        }
+
+        &:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+        }
+    }
+    .gesimatic-form__label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #374151;
+
+        margin-bottom: 6px;
+
+        // mejora legibilidad en móvil
+        line-height: 1.4;
+    }
+
+      .gesimatic-form__button {
+        width: 100%;
+        padding: 12px 16px;
+        margin-top: 10px;
+
+        font-size: 1rem;
+        font-weight: 600;
+        color: #ffffff;
+
+        background-color: #198754;
+        border: none;
+        border-radius: 8px;
+
+        cursor: pointer;
+
+        transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+
+        // Hover
+        &:hover {
+            background-color: #157347;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        // Click
+        &:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        // Focus accesible
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.3);
+        }
+
+        // Estado deshabilitado (muy útil para API)
+        &:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    }
+}
