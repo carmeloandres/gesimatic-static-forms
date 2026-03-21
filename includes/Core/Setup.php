@@ -1,41 +1,32 @@
 <?php
 
-namespace GesimaticStaticForms\Blocks;
+namespace GesimaticStaticForms\Core;
 
 // Prevent direct access 
-if ( ! defined( 'ABSPATH' ) ) {die;} ; 
-
+if ( ! defined( 'ABSPATH' ) ) {exit;} ; 
 
 /**
- * Class Gesimatic_Server_Blocks
- *
- * This class contains the code necessary to create the server side gesimatic server blocks
- *
- * @package Gesimatic-server
- */
-class Blocks {
+ * Class Setup.
+ * 
+ * @package Gesimatic
+*/
+class Setup {
 
-  /**
-     * Class constructor.
-     *
-     * Add the necessary hooks
-     * 
-     */
+    /**
+    * Empty construct function to enable future use
+    */
     function __construct(){
-
- 		// Register GesimaticSever API REST endpoints
-        add_action('init',array($this,'register_blocks'));
-       
+        
     }
 
     /**
-	 * registers the blocks and block assets 
-	 * 
-	 * This method registers the Gesimatic server Blocks and the necesary assets to work.
-	 *
-	 * @return void
-	 */
-    function register_blocks(){
-         register_block_type(GESIMATIC_STATIC_FORMS_PATH. '/blocks/member-register');
+     * Delete plugin components.
+     *
+     * @return void
+     */
+    public static function delete(): void {
+//        delete_option('gesimatic_api_token');
+
+//		delete_option('gesimatic_registered_plugins');
     }
 }
