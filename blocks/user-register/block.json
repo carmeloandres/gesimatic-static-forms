@@ -8,7 +8,7 @@
     "version": "1.0.0",
     "textdomain": "gesimatic-static-forms",
     "editorScript": "gesimatic-user-register-editor",
-    "style": "gesimatic-member-register-style",
+    "style": "gesimatic-user-register-style",
     "editorStyle": "file:./build/index.css",
 
      "attributes": {
@@ -24,17 +24,9 @@
             "type": "string",
             "default": "User register form"
         },
-        "showName": {
-            "type": "boolean",
-            "default": true
-        },
         "nameLabel": {
             "type": "string",
             "default": "User name"
-        },
-        "showEmail": {
-            "type": "boolean",
-            "default": true
         },
         "emailLabel": {
             "type": "string",
@@ -44,9 +36,21 @@
             "type": "string",
             "default": "subscriber"
         },
+        "elementsColor": {
+            "type": "string",
+            "default": "#198754"
+        },
         "buttonLabel": {
             "type": "string",
             "default": "Register"
+        },
+        "warningLabel": {
+            "type": "string",
+            "default": "Registering the user"
+        },
+        "successLabel": {
+            "type": "string",
+            "default": "User registered successfully"
         },
         "redirectUrl": {
             "type": "string",

@@ -37,7 +37,6 @@ class Blocks {
 	 */
     function register_blocks(){
 
-    error_log ('Blocks::register_blocks() executed, $url: '.var_export(GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/build/index.js',true));
         wp_register_script(
             'gesimatic-user-register-editor',
             GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/build/index.js',
@@ -54,6 +53,52 @@ class Blocks {
             $all_roles,
         );
 
-        register_block_type(GESIMATIC_STATIC_FORMS_PATH. '/blocks/user-register');
+        wp_register_style(
+            'gesimatic-user-register-style',
+            GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/build/index.css',
+            [],
+            GESIMATIC_STATIC_FORMS_VERSION
+        );
+
+        register_block_type(GESIMATIC_STATIC_FORMS_PATH. '/blocks/user-register',['render_callback' => [$this,'user_register_render_cb']]);
     }
+
+    /**
+	 * renders the user-register block 
+	 * 
+	 * This method gets the user-register attributes an render to frontend the block.
+	 *
+	 * @return void
+	 */
+    function user_register_render_cb($atts){
+        error_log ('user_register_render_cb - $atts : '.var_export($atts,true));
+
+        $output = '';
+
+        ob_start();
+        ?>
+        <form id="<?php echo $atts['formId']; ?>" class="wp-block-gesimatic-static-forms-user-register">
+            <?php if($atts['showTitle'] == true) { ?>
+                <h2 class='gesimatic-form__title'><?php echo $atts['title']; ?></h2>
+            <?php } ?> 
+            <label class='gesimatic-form__label'><?php echo $atts['nameLabel']; ?></label>
+            <input type="text" class='gesimatic-form__input'/>
+            <label class='gesimatic-form__label'><?php echo $atts['emailLabel']; ?></label>
+            <input type="email" class='gesimatic-form__input'/>
+            <button type="button" class='gesimatic-form__button'><?php echo $atts['buttonLabel']; ?></button>
+        </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('[data-form-id="<?php echo $form_id; ?>"]');
+
+
+}
+        <?php
+        $output = ob_get_contents();
+        ob_end_clean();
+
+         return $output;
+    }
+
 }
