@@ -7,14 +7,14 @@
     "description": "Register form for Wordpress users",
     "version": "1.0.0",
     "textdomain": "gesimatic-static-forms",
-    "editorScript": "file:./build/index.js",
+    "editorScript": "gesimatic-user-register-editor",
     "style": "gesimatic-member-register-style",
     "editorStyle": "file:./build/index.css",
 
      "attributes": {
         "formId": {
             "type": "string",
-            "default": ""
+            "default": "gesimatic-static-forms-0"
         },
         "showTitle": {
             "type": "boolean",
@@ -39,6 +39,10 @@
         "emailLabel": {
             "type": "string",
             "default": "User email"
+        },
+        "userRole": {
+            "type": "string",
+            "default": "subscriber"
         },
         "buttonLabel": {
             "type": "string",

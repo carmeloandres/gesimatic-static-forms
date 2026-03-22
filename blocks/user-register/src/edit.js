@@ -1,10 +1,24 @@
+import { __ }from '@wordpress/i18n';
+import { useEffect, useState } from "@wordpress/element";
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl, TextControl } from '@wordpress/components';
+import { PanelBody, SelectControl, ToggleControl, TextControl } from '@wordpress/components';
+import { getNumberId } from '../../helpers';
 
 export default function Edit({ attributes, setAttributes }) {
 
-    const { showName, nameLabel, showEmail, emailLabel, showTitle, title, formId, buttonLabel, redirectUrl } = attributes;
-    console.log ('useBlockProps :',useBlockProps);
+    const { nameLabel, emailLabel, showTitle, title, formId, userRole, buttonLabel, redirectUrl } = attributes;
+
+    const [availableRoles, setAvailableRoles] = useState([{label: 'subscriber', value: 'subscriber'}])
+
+    useEffect(() => {
+        if (getNumberId == '0'){
+            let segundos = Math.trunc(Date.now() / 1000);
+			setAttributes({formId: 'gesimatic-static-forms-'+segundos.toString()})
+        }
+
+        setAvailableRoles(Object.entries(gesimaticRoles).map(([value, label]) => ({label,value})));
+            
+    },[])
 
     return (
         <>
@@ -26,26 +40,23 @@ export default function Edit({ attributes, setAttributes }) {
                         value={title}
                         onChange={(value) => setAttributes({ title: value })}
                     />
-                    <ToggleControl
-                        label="Show Name"
-                        checked={showName}
-                        onChange={(value) => setAttributes({ showName: value })}
-                    />
                     <TextControl
                         label="Name Label"
                         value={nameLabel}
                         onChange={(value) => setAttributes({ nameLabel: value })}
-                    />
-                    <ToggleControl
-                        label="Show Email"
-                        checked={showEmail}
-                        onChange={(value) => setAttributes({ showEmail: value })}
                     />
                     <TextControl
                         label="Email Label"
                         value={emailLabel}
                         onChange={(value) => setAttributes({ emailLabel: value })}
                     />
+                    <SelectControl
+                        label={ __( 'Select user role', 'gesimatic-static-forms' ) }
+                        value={ userRole }
+                        options={ [...availableRoles] }
+                        onChange={ ( newValue ) => setAttributes( { userRole: newValue } ) }
+                        help={ __( 'Select the user role used at registrarion.', 'gesimatic-static-forms' ) }
+                    />                   
                     <TextControl
                         label="Button Label"
                         value={buttonLabel}
@@ -62,12 +73,10 @@ export default function Edit({ attributes, setAttributes }) {
 
             <div {...useBlockProps()}>
                 { showTitle && <h2 className='gesimatic-form__title'>{title}</h2> }
-                <label className='gesimatic-form__label'></label>
+                <label className='gesimatic-form__label'>{nameLabel}</label>
                 <input type="text" className='gesimatic-form__input'/>
-                {showName && <p>Name field enabled</p>}
-                <label className='gesimatic-form__label'></label>
+                <label className='gesimatic-form__label'>{emailLabel}</label>
                 <input type="email" className='gesimatic-form__input'/>
-                {showEmail && <p>Email field enabled</p>}
                 <button type="button" className='gesimatic-form__button'>{buttonLabel}</button>
             </div>
         </>

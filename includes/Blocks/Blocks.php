@@ -37,12 +37,21 @@ class Blocks {
 	 */
     function register_blocks(){
 
-    error_log ('Blocks::register_blocks() executed, $params: ');//.var_export($params,true));
+    error_log ('Blocks::register_blocks() executed, $url: '.var_export(GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/build/index.js',true));
         wp_register_script(
             'gesimatic-user-register-editor',
-            GESIMATIC_STATIC_FORMS_PATH.'blocks/user-register/build/index.js',
-            [],
+            GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/build/index.js',
+            [ 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components' ],
             GESIMATIC_STATIC_FORMS_VERSION
+        );
+
+        $wp_roles = wp_roles();
+        $all_roles = $wp_roles->get_names();
+        
+        wp_localize_script(
+            'gesimatic-user-register-editor',
+            'gesimaticRoles',
+            $all_roles,
         );
 
         register_block_type(GESIMATIC_STATIC_FORMS_PATH. '/blocks/user-register');
