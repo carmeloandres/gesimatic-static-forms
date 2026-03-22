@@ -37,6 +37,14 @@ class Blocks {
 	 */
     function register_blocks(){
 
+        // Frontend script
+        wp_register_script(
+            'gesimatic-user-register-js',
+            GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/gesimatic-static-forms-user-register.js',
+            [ 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components' ],
+            GESIMATIC_STATIC_FORMS_VERSION
+        );
+
         wp_register_script(
             'gesimatic-user-register-editor',
             GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/build/index.js',
@@ -52,14 +60,14 @@ class Blocks {
             'gesimaticRoles',
             $all_roles,
         );
-
+/*
         wp_register_style(
             'gesimatic-user-register-style',
             GESIMATIC_STATIC_FORMS_URL.'blocks/user-register/build/index.css',
             [],
             GESIMATIC_STATIC_FORMS_VERSION
         );
-
+*/
         register_block_type(GESIMATIC_STATIC_FORMS_PATH. '/blocks/user-register',['render_callback' => [$this,'user_register_render_cb']]);
     }
 
@@ -74,21 +82,30 @@ class Blocks {
         error_log ('user_register_render_cb - $atts : '.var_export($atts,true));
 
         $output = '';
+        $config = [
+            "restUrl" => esc_url_raw( rest_url( 'gesimatic-static-forms/v1/user-register' ) ),
+            "nonce" => wp_create_nonce( 'wp_rest' ),
+            "warningLabel" => $atts['warningLabel'],
+            "successLabel" => $atts['successLabel'],
+        ];
 
         ob_start();
         ?>
-        <form id="<?php echo $atts['formId']; ?>" class="wp-block-gesimatic-static-forms-user-register">
+        <form 
+            id="<?php echo $atts['formId']; ?>" 
+            class="wp-block-gesimatic-static-forms-user-register"
+            data-config='<?php echo json_encode($config); ?>'
+        >
             <?php if($atts['showTitle'] == true) { ?>
                 <h2 class='gesimatic-form__title'><?php echo $atts['title']; ?></h2>
             <?php } ?> 
             <label class='gesimatic-form__label'><?php echo $atts['nameLabel']; ?></label>
-            <input type="text" class='gesimatic-form__input' style="border-color:<?php echo $atts['elementsColor']; ?>"/>
+            <input type="text" class='gesimatic-form__input' name="user_name" style="border-color:<?php echo $atts['elementsColor']; ?>">
             <label class='gesimatic-form__label'><?php echo $atts['emailLabel']; ?></label>
-            <input type="email" class='gesimatic-form__input' style="border-color:<?php echo $atts['elementsColor']; ?>"/>
+            <input type="email" class='gesimatic-form__input' name="user_email" style="border-color:<?php echo $atts['elementsColor']; ?>">
+            <input type="text" name="gesimatic_website" style="display:none">
             <button type="button" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
         </form>
-
-
         <?php
         $output = ob_get_contents();
         ob_end_clean();

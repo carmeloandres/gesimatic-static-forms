@@ -8,8 +8,8 @@
     "version": "1.0.0",
     "textdomain": "gesimatic-static-forms",
     "editorScript": "gesimatic-user-register-editor",
-    "style": "gesimatic-user-register-style",
-    "editorStyle": "file:./build/index.css",
+    "style": "file:./build/index.css",
+    "viewScript":"gesimatic-user-register-js",
 
      "attributes": {
         "formId": {
