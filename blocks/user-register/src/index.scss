@@ -52,8 +52,9 @@
         }
 
         &:focus {
-            outline: 2px solid currentColor;
-            outline-offset: 2px;        }
+            border-width: 2px;
+            transform: scale(1.01);
+        }
     }
     .gesimatic-form__label {
         display: block;

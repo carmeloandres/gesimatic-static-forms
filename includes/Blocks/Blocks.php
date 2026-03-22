@@ -82,18 +82,13 @@ class Blocks {
                 <h2 class='gesimatic-form__title'><?php echo $atts['title']; ?></h2>
             <?php } ?> 
             <label class='gesimatic-form__label'><?php echo $atts['nameLabel']; ?></label>
-            <input type="text" class='gesimatic-form__input'/>
+            <input type="text" class='gesimatic-form__input' style="border-color:<?php echo $atts['elementsColor']; ?>"/>
             <label class='gesimatic-form__label'><?php echo $atts['emailLabel']; ?></label>
-            <input type="email" class='gesimatic-form__input'/>
-            <button type="button" class='gesimatic-form__button'><?php echo $atts['buttonLabel']; ?></button>
+            <input type="email" class='gesimatic-form__input' style="border-color:<?php echo $atts['elementsColor']; ?>"/>
+            <button type="button" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
         </form>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('[data-form-id="<?php echo $form_id; ?>"]');
 
-
-}
         <?php
         $output = ob_get_contents();
         ob_end_clean();
