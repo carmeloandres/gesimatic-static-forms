@@ -49,11 +49,19 @@ const enviarDatosAPI = async (formData, config, form) => {
     }
 };
 
-const gsmtcFormsFormSubmit = (e, config) => {
+const gesimaticStaticFormsFormSubmit = (e, config) => {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
 
+    const alert = form.querySelector('[data-gesimatic="alert"]');
+        console.log('alert :', alert);
+        alert.classList.replace('display-none','gesimatic-alert-warning');
+        alert.innerHTML = form.dataset.config.warningLabel;
+        console.log ('waringLabel:',form.dataset.config.warningLabel)
+
+    console.log('form :', form);
+    console.log('formData :',formData)
     // time trap
     if ((Date.now() - startTime) < 2000 ){
         return
@@ -91,10 +99,11 @@ window.onload = () => {
     forms.forEach( form => {
         let formId = form.id;
         let config = JSON.parse(form.dataset.config);
-        console.log('formId :',formId);
-        gesimaticStaticFormsUserRegister = [...gesimaticStaticFormsUserRegister,{formId:{'name':'','email':''}}]
+//        console.log('formId :',formId);
+//        gesimaticStaticFormsUserRegister = [...gesimaticStaticFormsUserRegister,{formId:{'name':'','email':''}}]
         console.log('config : ', config)
-       // form.addEventListener('submit',gsmtcFormsFormSubmit)      
+       form.addEventListener('submit',gesimaticStaticFormsFormSubmit);
+       console.log('form submit handler added');      
     });
-console.log('gesimaticStaticFormsUserRegister :',gesimaticStaticFormsUserRegister);
+//console.log('gesimaticStaticFormsUserRegister :',gesimaticStaticFormsUserRegister);
 }

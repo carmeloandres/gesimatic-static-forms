@@ -79,7 +79,7 @@ class Blocks {
 	 * @return void
 	 */
     function user_register_render_cb($atts){
-        error_log ('user_register_render_cb - $atts : '.var_export($atts,true));
+//        error_log ('user_register_render_cb - $atts : '.var_export($atts,true));
 
         $output = '';
         $config = [
@@ -104,7 +104,8 @@ class Blocks {
             <label class='gesimatic-form__label'><?php echo $atts['emailLabel']; ?></label>
             <input type="email" class='gesimatic-form__input' name="user_email" style="border-color:<?php echo $atts['elementsColor']; ?>">
             <input type="text" name="gesimatic_website" style="display:none">
-            <button type="button" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
+            <div data-gesimatic="alert" class='display-none'></div>
+            <button type="submit" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
         </form>
         <?php
         $output = ob_get_contents();

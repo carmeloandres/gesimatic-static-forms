@@ -2,7 +2,7 @@
     "apiVersion": 3,
     "name": "gesimatic-static-forms/user-register",
     "title": "User Register",
-    "category": "widgets",
+    "category": "gesimatic",
     "icon": "forms",
     "description": "Register form for Wordpress users",
     "version": "1.0.0",
