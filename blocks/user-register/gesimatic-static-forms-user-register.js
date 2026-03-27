@@ -49,29 +49,31 @@ const enviarDatosAPI = async (formData, config, form) => {
     }
 };
 
-const gesimaticStaticFormsFormSubmit = (e, config) => {
+const gesimaticStaticFormsFormSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
-
-    const alert = form.querySelector('[data-gesimatic="alert"]');
-        console.log('alert :', alert);
-        alert.classList.replace('display-none','gesimatic-alert-warning');
-        alert.innerHTML = form.dataset.config.warningLabel;
-        console.log ('waringLabel:',form.dataset.config.warningLabel)
-
+    let config = JSON.parse(form.dataset.config);
+    
+    const notice = form.querySelector('[data-gesimatic="alert"]');
+    console.log('notice :', notice);
+    console.log ('waringLabel:',config.warningLabel)
+    notice.classList.replace('display-none','gesimatic-alert-warning');
+    notice.innerHTML = config.warningLabel;
+    
     console.log('form :', form);
     console.log('formData :',formData)
+    alert(config.warningLabel + ": El nombre es demasiado corto.");
     // time trap
-    if ((Date.now() - startTime) < 2000 ){
+/*    if ((Date.now() - startTime) < 2000 ){
         return
     }
-    // check validation, this field must be empty
+ /*   // check validation, this field must be empty
     const gesimaticWebsite = formData.get('gesimatic_website').trim();
     if(gesimaticWebsite != ''){
         return;
     }
-
+/*
     // 1. Obtener valores
     const userName = formData.get('user_name').trim();
     const userEmail = formData.get('user_email').trim();
@@ -89,7 +91,8 @@ const gesimaticStaticFormsFormSubmit = (e, config) => {
         return;
     }
 // 4. Si todo está bien, procedemos al Fetch
-    enviarDatosAPI(formData, config, form);
+  //  enviarDatosAPI(formData, config, form);
+  */
 };
 
 window.onload = () => {

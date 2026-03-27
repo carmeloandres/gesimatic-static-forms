@@ -104,7 +104,7 @@ class Blocks {
             <label class='gesimatic-form__label'><?php echo $atts['emailLabel']; ?></label>
             <input type="email" class='gesimatic-form__input' name="user_email" style="border-color:<?php echo $atts['elementsColor']; ?>">
             <input type="text" name="gesimatic_website" style="display:none">
-            <div data-gesimatic="alert" class='display-none'></div>
+            <div data-gesimatic="alert" class='gesimatic-alert display-none'></div>
             <button type="submit" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
         </form>
         <?php
