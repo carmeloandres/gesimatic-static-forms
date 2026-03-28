@@ -50,19 +50,27 @@ const enviarDatosAPI = async (formData, config, form) => {
 };
 
 const gesimaticStaticFormsFormSubmit = (e) => {
-    e.preventDefault();
     const form = e.target;
+    console.log('form :',form);
+    
+    if (!form.checkValidity()) {
+        form.reportValidity(); // Muestra el mensaje de error (el "title") al usuario
+        return; // Detiene la ejecución y no envía a la API    
+    }
+    
+    e.preventDefault();
     const formData = new FormData(form);
+    console.log ('formData :',formData);
     let config = JSON.parse(form.dataset.config);
     
     const notice = form.querySelector('[data-gesimatic="alert"]');
-    console.log('notice :', notice);
-    console.log ('waringLabel:',config.warningLabel)
+ //   console.log('notice :', notice);
+ //   console.log ('waringLabel:',config.warningLabel)
     notice.classList.replace('display-none','gesimatic-alert-warning');
     notice.innerHTML = config.warningLabel;
     
-    console.log('form :', form);
-    console.log('formData :',formData)
+//    console.log('form :', form);
+//    console.log('formData :',formData)
     alert(config.warningLabel + ": El nombre es demasiado corto.");
     // time trap
 /*    if ((Date.now() - startTime) < 2000 ){

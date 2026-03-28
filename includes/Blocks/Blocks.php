@@ -100,9 +100,23 @@ class Blocks {
                 <h2 class='gesimatic-form__title'><?php echo $atts['title']; ?></h2>
             <?php } ?> 
             <label class='gesimatic-form__label'><?php echo $atts['nameLabel']; ?></label>
-            <input type="text" class='gesimatic-form__input' name="user_name" style="border-color:<?php echo $atts['elementsColor']; ?>">
+            <input 
+                type="text" 
+                class='gesimatic-form__input' 
+                name="user_name" 
+                style="border-color:<?php echo $atts['elementsColor']; ?>"
+                pattern="[a-zA-Z0-9.@_\s\-]{4,}"
+                title="<?php echo __('The name must be at least 4 characters long and can only contain letters, numbers, periods, hyphens, or spaces.','gesimatic-static-forms'); ?>"
+                required
+            >
             <label class='gesimatic-form__label'><?php echo $atts['emailLabel']; ?></label>
-            <input type="email" class='gesimatic-form__input' name="user_email" style="border-color:<?php echo $atts['elementsColor']; ?>">
+            <input 
+                type="email" 
+                class='gesimatic-form__input' 
+                name="user_email"
+                required 
+                style="border-color:<?php echo $atts['elementsColor']; ?>"
+            >
             <input type="text" name="gesimatic_website" style="display:none">
             <div data-gesimatic="alert" class='gesimatic-alert display-none'></div>
             <button type="submit" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
