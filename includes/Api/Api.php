@@ -165,7 +165,7 @@ class Api extends Setup {
 			);
 
 			// 📧 7. Enviar email
-			$subject = 'Set your password';
+			$subject = __('Set your password'.'gesimatic-static-forms');
 
 			$message = "Hello {$user->user_login},\n\n";
 			$message .= "Click the following link to set your password:\n\n";
