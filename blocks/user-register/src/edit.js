@@ -6,7 +6,7 @@ import { getNumberId } from '../../helpers';
 
 export default function Edit({ attributes, setAttributes }) {
 
-    const { elementsColor, nameLabel, emailLabel, showTitle, title, formId, userRole, buttonLabel,warningLabel, successLabel, redirectUrl } = attributes;
+    const { elementsColor, nameLabel, emailLabel, showTitle, title, formId, userRole, buttonLabel, redirectUrl } = attributes;
 
     const [availableRoles, setAvailableRoles] = useState([{label: 'subscriber', value: 'subscriber'}])
 
@@ -75,16 +75,6 @@ export default function Edit({ attributes, setAttributes }) {
                         onChange={ ( newValue ) => setAttributes( { userRole: newValue } ) }
                         help={ __( 'Select the user role used at registrarion.', 'gesimatic-static-forms' ) }
                     />                   
-                    <TextControl
-                        label="Warning Label"
-                        value={warningLabel}
-                        onChange={(value) => setAttributes({ warningLabel: value })}
-                    />
-                    <TextControl
-                        label="Success Label"
-                        value={successLabel}
-                        onChange={(value) => setAttributes({ successLabel: value })}
-                    />
                     <TextControl
                         label="Redirect URL"
                         value={redirectUrl}

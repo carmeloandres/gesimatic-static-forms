@@ -44,14 +44,6 @@
             "type": "string",
             "default": "Register"
         },
-        "warningLabel": {
-            "type": "string",
-            "default": "Registering the user"
-        },
-        "successLabel": {
-            "type": "string",
-            "default": "User registered successfully"
-        },
         "redirectUrl": {
             "type": "string",
             "default": ""

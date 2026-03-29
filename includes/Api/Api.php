@@ -82,70 +82,107 @@ class Api extends Setup {
 	 *
 	 * @return void
 	 */
-     function user_register_api_controler(\WP_REST_Request $request ){
+     function manage_user_register_api_request(\WP_REST_Request $request ){
 
-		 $result = false;
+		 $result = [
+			'success' => false,
+        	'message' => __('Process not ended.','gesimatic-static-forms'),
+    	];
 		 
-		 if ($request->sanitize_params()){
+		if ($request->sanitize_params()){
 			 
-			 $params = $request->get_params();
-			 error_log ('user_register_api_controler, $params: '.var_export($params,true));
+			$params = $request->get_params();
+			error_log ('manage_user_register_api_request, $params: '.var_export($params,true));
 		
-            if (isset($params['action'])){
-				$action = $params['action'];
-/*				
-				switch ($action){
-                    case 'get_access_settings':
-                            $result = $this->get_access_settings();
-                            break;
-					case 'get_smtp_settings':
-							$result = $this->get_smtp_settings();
-							break;
-					case 'set_access_settings':
-							$result = $this->set_access_settings($params);
-							break;
-					case 'set_smtp_settings':
-							$result = $this->set_smtp_settings($params);
-							break;	
-					case 'get_bloqued_ips':
-							$result = $this->get_bloqued_ips($params);
-							break;
-					case 'get_status_ips':
-							$result = $this->get_status_ips($params);
-							break;
-					case 'get_pagination':
-							$result = $this->get_pagination($params);
-							break;
-					case 'do_status_ips_action':
-							$result = $this->do_status_ips_action($params);
-							break;
-					case 'send_test_email':
-							$result = $this->send_test_email($params);
-							break;
-//					case 'register_account':
-//							$result = $this->register_account($params);
-//							break;
-					case 'unregister_account':
-							$result = update_option('gsmtc_api_token','');
-							break;
-					case 'get_backup_download':
-							$result = $this->get_backup_download();
-							break;
-					default:
-							$result = apply_filters('gesimatic_admin_api_action_'.$action,$result,$params);
-                            // ejemplo de llamada: add_filter(gesimatic_api_action_register_account,[$this,'register_account']);
-                            // modificando la función para que reciba dos parametros, $result y $params.
-							break;							
-						}
-*/
-				$result = apply_filters('gesimatic_admin_api_action_'.$action,$result,$params);
-			} 
+			if ($params['gesimatic_website'] !== '')
+				return new \WP_REST_Response($result, 200);
+
+			$username = sanitize_user($params['user_name']);
+			$email = sanitize_email($params['user_email']);
+
+			// 🔐 1. Validaciones básicas
+			if (empty($username) || empty($email)) {
+				$result = [
+					'success' => false,
+        			'message' => __('Missing required fields.','gesimatic-static-forms'),
+    			];
+				return new \WP_REST_Response($result, 200);
+			}
+
+		    if (!is_email($email)) {
+				$result = [
+					'success' => false,
+        			'message' => __('Invalid email.','gesimatic-static-forms'),
+    			];
+				return new \WP_REST_Response($result, 200);
+		    }
+
+	    	if (username_exists($username) || email_exists($email)) {
+				$result = [
+					'success' => false,
+        			'message' => __('User already exists.','gesimatic-static-forms'),
+    			];
+				return new \WP_REST_Response($result, 200);
+		    }
+
+			// 🔐 2. Obtener rol (desde tu sistema seguro)
+			$role = 'subscriber'; // 👈 aquí debes integrar tu lógica segura
+
+			$allowed_roles = ['subscriber', 'customer'];
+
+			if (!in_array($role, $allowed_roles, true)) {
+				return new WP_Error('invalid_role', 'Invalid role');
+			}
+
+			// 🔐 3. Crear usuario SIN contraseña usable
+			$random_password = wp_generate_password(20, true, true);
+
+			$user_id = wp_create_user($username, $random_password, $email);
+
+			if (is_wp_error($user_id)) {
+				return $user_id;
+			}
+
+			// 🔐 4. Asignar rol
+			wp_update_user([
+				'ID'   => $user_id,
+				'role' => $role
+			]);
+
+			// 🔐 5. Generar clave de reset
+			$user = get_user_by('id', $user_id);
+
+			$reset_key = get_password_reset_key($user);
+
+			if (is_wp_error($reset_key)) {
+				return $reset_key;
+			}
+
+			// 🔗 6. Crear URL de reset
+			$reset_url = network_site_url(
+				"wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user->user_login),
+				'login'
+			);
+
+			// 📧 7. Enviar email
+			$subject = 'Set your password';
+
+			$message = "Hello {$user->user_login},\n\n";
+			$message .= "Click the following link to set your password:\n\n";
+			$message .= $reset_url . "\n\n";
+			$message .= "If you did not request this, ignore this email.";
+
+			wp_mail($user->user_email, $subject, $message);
+
+			$result = [
+				'success' => true,
+				'message' => 'User registered. Check your email.'
+			];
+
 		}
 		error_log ('admin_api_controler, $result: '.var_export($result,true));
 
 		return new \WP_REST_Response($result, 200);
-//        echo json_encode($result);
-//		exit();
 	}
 
 

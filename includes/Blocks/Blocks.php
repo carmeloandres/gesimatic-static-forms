@@ -79,14 +79,13 @@ class Blocks {
 	 * @return void
 	 */
     function user_register_render_cb($atts){
-//        error_log ('user_register_render_cb - $atts : '.var_export($atts,true));
+        global $post;
 
         $output = '';
         $config = [
             "restUrl" => esc_url_raw( rest_url( 'gesimatic-static-forms/v1/user-register' ) ),
             "nonce" => wp_create_nonce( 'wp_rest' ),
-            "warningLabel" => $atts['warningLabel'],
-            "successLabel" => $atts['successLabel'],
+            "warningLabel" => __('Registering user... please wait.','gesimatic-static-forms'),
         ];
 
         ob_start();
@@ -118,6 +117,8 @@ class Blocks {
                 style="border-color:<?php echo $atts['elementsColor']; ?>"
             >
             <input type="text" name="gesimatic_website" style="display:none">
+            <input type="text" name="gesimatic_post_id" style="display:none" value="<?php echo $post->ID; ?>">
+            <input type="text" name="gesimatic_form_id" style="display:none" value="<?php echo $atts['formId']; ?>">
             <div data-gesimatic="alert" class='gesimatic-alert display-none'></div>
             <button type="submit" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
         </form>

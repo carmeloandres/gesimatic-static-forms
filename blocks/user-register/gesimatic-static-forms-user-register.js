@@ -6,7 +6,7 @@ const startTime = Date.now();
  * @param {Object} config - El objeto de configuración (restUrl, nonce, labels)
  * @param {HTMLFormElement} form - Referencia al formulario para feedback visual
  */
-const enviarDatosAPI = async (formData, config, form) => {
+const gesimaticStaticFormsUserRegisterSend = async (formData, config, form) => {
     // 1. Mostramos un estado de "Cargando" en el botón
     const submitButton = form.querySelector('.gesimatic-form__button');
     const originalButtonText = submitButton.textContent;
@@ -27,6 +27,8 @@ const enviarDatosAPI = async (formData, config, form) => {
         });
 
         const result = await response.json();
+
+        console.log ('Api response :',result)
 
         if (response.ok && result.success) {
             // ÉXITO: WordPress respondió con wp_send_json_success
@@ -49,41 +51,40 @@ const enviarDatosAPI = async (formData, config, form) => {
     }
 };
 
-const gesimaticStaticFormsFormSubmit = (e) => {
-    const form = e.target;
-    console.log('form :',form);
-    
-    if (!form.checkValidity()) {
-        form.reportValidity(); // Muestra el mensaje de error (el "title") al usuario
-        return; // Detiene la ejecución y no envía a la API    
-    }
-    
+const gesimaticStaticFormsFormSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(form);
-    console.log ('formData :',formData);
-    let config = JSON.parse(form.dataset.config);
-    
-    const notice = form.querySelector('[data-gesimatic="alert"]');
- //   console.log('notice :', notice);
- //   console.log ('waringLabel:',config.warningLabel)
-    notice.classList.replace('display-none','gesimatic-alert-warning');
-    notice.innerHTML = config.warningLabel;
-    
-//    console.log('form :', form);
-//    console.log('formData :',formData)
-    alert(config.warningLabel + ": El nombre es demasiado corto.");
+
+    const form = e.target;
+
+    if (!form.checkValidity()) {
+        form.reportValidity(); 
+        return;     
+    }
+
     // time trap
-/*    if ((Date.now() - startTime) < 2000 ){
+    if ((Date.now() - startTime) < 2000 ){
         return
     }
- /*   // check validation, this field must be empty
+
+    const formData = new FormData(form);
+    console.log ('formData :',Object.fromEntries(formData));
+
+    // check validation, this field must be empty
     const gesimaticWebsite = formData.get('gesimatic_website').trim();
     if(gesimaticWebsite != ''){
         return;
     }
-/*
+
+    const config = JSON.parse(form.dataset.config);
+    const notice = form.querySelector('[data-gesimatic="alert"]');
+    
+    notice.classList.replace('display-none','gesimatic-alert-warning');
+    notice.innerHTML = config.warningLabel;
+    
+    
+    const result = await gesimaticStaticFormsUserRegisterSend(formData, config, form);
     // 1. Obtener valores
-    const userName = formData.get('user_name').trim();
+/*    const userName = formData.get('user_name').trim();
     const userEmail = formData.get('user_email').trim();
 
     // 2. Validar Nombre (mínimo 3 caracteres)
@@ -99,7 +100,6 @@ const gesimaticStaticFormsFormSubmit = (e) => {
         return;
     }
 // 4. Si todo está bien, procedemos al Fetch
-  //  enviarDatosAPI(formData, config, form);
   */
 };
 

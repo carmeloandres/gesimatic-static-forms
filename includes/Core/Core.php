@@ -43,9 +43,9 @@ class Core extends Setup {
         if (! isset($this->instances['blocks']))
             $this->instances['blocks'] = new Blocks();
 
-        // To show the gesimatic admin menu
-/*        add_action('admin_menu',[$this,'show_admin_menu']);
-
+        // To set the user role at reset password if proceed
+        add_action('pasword_reset',[$this,'set_user_role']);
+/*
         // to load the admin assets
         add_action('admin_enqueue_scripts',[$this,'admin_enqueue_assets'], 10, 1);
 
@@ -68,5 +68,18 @@ class Core extends Setup {
         error_log ('Core::construct() executed, $params: ');//.var_export($params,true));
 */
     }
+
+     /**
+     * To set the user role.
+     *
+     * Sets the user role at reset password if proceed
+     */    
+    function set_user_role($user){
+        // $user → objeto WP_User
         
+        update_user_meta($user->ID, 'email_verified', true);
+
+        error_log("User {$user->user_login} has reset their password");
+    }
+
 }
