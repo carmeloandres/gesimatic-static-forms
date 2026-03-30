@@ -126,9 +126,13 @@ class Api extends Setup {
 		    }
 
 			// 🔐 2. Obtener rol (desde tu sistema seguro)
+			$post_id = sanitize_key($params['gesimatic_post_id']);
+			$form_id = sanitize_key($params['gesimatic_form_id']);
+
 			$role = 'subscriber'; // 👈 aquí debes integrar tu lógica segura
 
-			$allowed_roles = ['subscriber', 'customer'];
+//			$allowed_roles = ['subscriber', 'customer'];
+			$allowed_roles = self::get_allowed_roles();
 
 			if (!in_array($role, $allowed_roles, true)) {
 				return new WP_Error('invalid_role', 'Invalid role');

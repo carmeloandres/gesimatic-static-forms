@@ -13,6 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {exit;} ;
 class Setup {
 
     /**
+     * Restricted roles
+     */
+    public static $restricted_roles = ['administrator','author','contributor','editor'];
+
+    /**
     * Empty construct function to enable future use
     */
     function __construct(){
@@ -38,4 +43,18 @@ class Setup {
 
 //		delete_option('gesimatic_registered_plugins');
     }
+
+    /**
+     * To get the available roles.
+     *
+     * @return array
+     */
+    public static function get_allowed_roles(): array {
+        $wp_roles = wp_roles();
+        $all_roles = $wp_roles->get_names();
+
+        return array_diff_key($all_roles,array_flip(self::$restricted_roles));
+    }
+
+
 }

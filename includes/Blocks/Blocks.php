@@ -5,6 +5,7 @@ namespace GesimaticStaticForms\Blocks;
 // Prevent direct access 
 if ( ! defined( 'ABSPATH' ) ) {die;} ; 
 
+use GesimaticStaticForms\Core\Setup;
 
 /**
  * Class Gesimatic_Server_Blocks
@@ -13,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {die;} ;
  *
  * @package Gesimatic-server
  */
-class Blocks {
+class Blocks extends Setup{
 
   /**
      * Class constructor.
@@ -22,6 +23,8 @@ class Blocks {
      * 
      */
     function __construct(){
+        //call to parent constructor
+        parent::__construct();
 
  		// Register GesimaticSever API REST endpoints
         add_action('init',array($this,'register_blocks'));
@@ -52,13 +55,16 @@ class Blocks {
             GESIMATIC_STATIC_FORMS_VERSION
         );
 
-        $wp_roles = wp_roles();
-        $all_roles = $wp_roles->get_names();
-        
+//        $wp_roles = wp_roles();
+//        $all_roles = $wp_roles->get_names();
+//        error_log ('Blocks->register_blocks() executed, $all_roles: '.var_export($all_roles,true));
+
+        $allowed_roles = self::get_allowed_roles();
+
         wp_localize_script(
             'gesimatic-user-register-editor',
             'gesimaticRoles',
-            $all_roles,
+            $allowed_roles,
         );
 /*
         wp_register_style(
