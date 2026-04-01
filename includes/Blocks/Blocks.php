@@ -93,6 +93,13 @@ class Blocks extends Setup{
             "nonce" => wp_create_nonce( 'wp_rest' ),
             "warningLabel" => __('Registering user... please wait.','gesimatic-static-forms'),
         ];
+        $dataload = json_encode(
+            [
+                'post_id' => $post->ID,
+                'form_id' => $atts['formId'],
+                'trap_time' => time(),
+            ]
+        );
 
         ob_start();
         ?>
@@ -123,8 +130,8 @@ class Blocks extends Setup{
                 style="border-color:<?php echo $atts['elementsColor']; ?>"
             >
             <input type="text" name="gesimatic_website" style="display:none">
-            <input type="text" name="gesimatic_post_id" style="display:none" value="<?php echo $post->ID; ?>">
-            <input type="text" name="gesimatic_form_id" style="display:none" value="<?php echo $atts['formId']; ?>">
+            <input type="hidden" name="gesimatic_dataload" value="<?php echo esc_attr($dataload); ?>">            
+            <input type="hidden" name="gesimatic_signature" value="<?php echo esc_attr(hash_hmac('sha256',$dataload,AUTH_SALT)); ?>">
             <div data-gesimatic="alert" class='gesimatic-alert display-none'></div>
             <button type="submit" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
         </form>

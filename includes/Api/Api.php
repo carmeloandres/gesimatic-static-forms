@@ -94,8 +94,14 @@ class Api extends Setup {
 			$params = $request->get_params();
 			error_log ('manage_user_register_api_request, $params: '.var_export($params,true));
 		
-			if ($params['gesimatic_website'] !== '')
+			// Validating the honeypot
+			if ($params['gesimatic_website'] !== ''){
+				$result = [
+					'success' => false,
+        			'message' => __('Bot detected.','gesimatic-static-forms'),
+    			];
 				return new \WP_REST_Response($result, 200);
+			}
 
 			$username = sanitize_user($params['user_name']);
 			$email = sanitize_email($params['user_email']);
@@ -125,14 +131,35 @@ class Api extends Setup {
 				return new \WP_REST_Response($result, 200);
 		    }
 
-			// 🔐 2. Obtener rol (desde tu sistema seguro)
-			$post_id = sanitize_key($params['gesimatic_post_id']);
-			$form_id = sanitize_key($params['gesimatic_form_id']);
+			// validating payload data
+			$dataload = $params['gesimatic_dataload'];
+			$signature = $params['gesimatic_signature'];
+			if( ! $this->data_validation($dataload, $signature)){
+				$result = [
+					'success' => false,
+        			'message' => __('Manipulated data','gesimatic-static-forms'),
+				];
+				return new \WP_REST_Response($result, 200);
+			}
+					
+			$data = json_decode($dataload);
+			error_log ('Api->manage_user_register_api_request, $data: '.var_export($data,true));
+			
+			if ((time() - $data['trap_time']) < 3) {
+				$result = [
+					'success' => false,
+        			'message' => __('Bot detected','gesimatic-static-forms'),
+				];
+				return new \WP_REST_Response($result, 200);
+			}
 
+
+
+			// 🔐 2. Obtener rol (desde tu sistema seguro)
 			$role = 'subscriber'; // 👈 aquí debes integrar tu lógica segura
 
 //			$allowed_roles = ['subscriber', 'customer'];
-			$allowed_roles = self::get_allowed_roles();
+/*			$allowed_roles = self::get_allowed_roles();
 
 			if (!in_array($role, $allowed_roles, true)) {
 				return new WP_Error('invalid_role', 'Invalid role');
@@ -182,15 +209,25 @@ class Api extends Setup {
 				'success' => true,
 				'message' => 'User registered. Check your email.'
 			];
-
+*/
 		}
+
 		error_log ('admin_api_controler, $result: '.var_export($result,true));
 
 		return new \WP_REST_Response($result, 200);
 	}
 
+    /**
+	 * To validate form data	  
+	 */
+	private function data_validation($dataload, $signature){
 
+		$expected_signature = hash_hmac('sha256', $dataload, AUTH_SALT);
 
+		if (!hash_equals($expected_signature, $signature)) {
+			return false;
+		} else {return true;}
+	}
 
     /**
 	 * To initialize the admin Api hooks	  
