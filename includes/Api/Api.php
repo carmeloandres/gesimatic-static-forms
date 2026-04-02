@@ -160,17 +160,19 @@ class Api extends Setup {
 
 			// 🔐 2. Obtener rol (desde tu sistema seguro)
 			$role = $this->get_user_role_from_form($data->post_id, $data->form_id);
+			$allowed_roles = self::get_allowed_roles();
+			if (in_array( ! $role, $allowed_roles, true)){
+				$result = [
+					'success' => false,
+        			'message' => __('Registration not allowed.','gesimatic-static-forms'),
+    			];
+				return new \WP_REST_Response($result, 200);
+			}
 			error_log ('Api->manage_user_register_api_request, $role: '.var_export($role,true));
 
-//			$allowed_roles = ['subscriber', 'customer'];
-/*			$allowed_roles = self::get_allowed_roles();
-
-			if (!in_array($role, $allowed_roles, true)) {
-				return new WP_Error('invalid_role', 'Invalid role');
-			}
 
 			// 🔐 3. Crear usuario SIN contraseña usable
-			$random_password = wp_generate_password(20, true, true);
+/*			$random_password = wp_generate_password(20, true, true);
 
 			$user_id = wp_create_user($username, $random_password, $email);
 
