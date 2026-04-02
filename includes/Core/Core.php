@@ -44,7 +44,10 @@ class Core extends Setup {
             $this->instances['blocks'] = new Blocks();
 
         // To set the user role at reset password if proceed
-        add_action('pasword_reset',[$this,'set_user_role']);
+        add_action('after_pasword_reset',[$this,'delete_user_activation_expires']);
+
+        // To clean the registered but inactive users
+        add_action( 'gesimatic_cleanup_user', [ $this, 'cleanup_inactive_user' ] );
 /*
         // to load the admin assets
         add_action('admin_enqueue_scripts',[$this,'admin_enqueue_assets'], 10, 1);
@@ -69,15 +72,34 @@ class Core extends Setup {
 */
     }
 
+    /**
+     * Función que se ejecutará en la cola de Action Scheduler
+     * @param int $user_id
+     */
+    public static function cleanup_inactive_user( $user_id ) {
+        // Comprobar que el usuario existe
+        $user = get_userdata( $user_id );
+        if ( ! $user ) return;
+
+        // Obtener la meta de expiración
+        $expire = get_user_meta( $user_id, '_gesimatic_activation_expire', true );
+
+        // Si ha expirado, eliminar usuario
+        if ( $expire && time() > intval($expire) ) {
+            wp_delete_user( $user_id );
+        }
+    }
+
      /**
      * To set the user role.
      *
      * Sets the user role at reset password if proceed
      */    
-    function set_user_role($user){
+    function delete_user_activation_expires($user){
         // $user → objeto WP_User
         
-        update_user_meta($user->ID, 'email_verified', true);
+        delete_user_meta($user->ID, 'gesimatic_pending_activation');
+        delete_user_meta($user->ID, 'gesimatic_activation_expires');
 
         error_log("User {$user->user_login} has reset their password");
     }

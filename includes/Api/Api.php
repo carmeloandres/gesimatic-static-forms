@@ -5,6 +5,7 @@ namespace GesimaticStaticForms\Api;
 // Prevent direct access 
 if ( ! defined( 'ABSPATH' ) ) {exit;} ;
 
+use Gesimatic\Core\Core;
 use GesimaticStaticForms\Core\Setup;
 
 /**
@@ -158,7 +159,7 @@ class Api extends Setup {
 		    }
 
 
-			// 🔐 2. Obtener rol (desde tu sistema seguro)
+			// 2. Get role (from your secure system)
 			$role = $this->get_user_role_from_form($data->post_id, $data->form_id);
 			$allowed_roles = self::get_allowed_roles();
 			if (in_array( ! $role, $allowed_roles, true)){
@@ -170,24 +171,43 @@ class Api extends Setup {
 			}
 			error_log ('Api->manage_user_register_api_request, $role: '.var_export($role,true));
 
+			// 3. Create user WITHOUT a usable password
 
-			// 🔐 3. Crear usuario SIN contraseña usable
-/*			$random_password = wp_generate_password(20, true, true);
-
-			$user_id = wp_create_user($username, $random_password, $email);
+			$user_id = wp_insert_user([
+				'user_login' => $username,
+				'user_email' => $email,
+				'user_pass'  => wp_generate_password(32, true, true),
+				'role'       => $role,
+			]);
 
 			if (is_wp_error($user_id)) {
-				return $user_id;
+				$result = [
+					'success' => false,
+        			'message' => __('Error creating user.','gesimatic-static-forms'),
+    			];
+				return new \WP_REST_Response($result, 200);
 			}
 
+			// Time límit (ex: 24h)
+			$expire = time() + DAY_IN_SECONDS;
+
+			update_user_meta($user_id, '_gesimatic_activation_expire', $expire);
+			
+			// Agendamos la limpieza con Action Scheduler
+			Core::instance()->get_queue()->scheduleSingle(
+				$expire,                    // momento de ejecución
+				'gesimatic_cleanup_user',      // hook
+				[ $user_id ]                   // argumentos
+			);
+			
 			// 🔐 4. Asignar rol
-			wp_update_user([
+/*			wp_update_user([
 				'ID'   => $user_id,
 				'role' => $role
 			]);
 
 			// 🔐 5. Generar clave de reset
-			$user = get_user_by('id', $user_id);
+/*			$user = get_user_by('id', $user_id);
 
 			$reset_key = get_password_reset_key($user);
 
