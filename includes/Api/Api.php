@@ -93,7 +93,32 @@ class Api extends Setup {
 			 
 			$params = $request->get_params();
 			error_log ('manage_user_register_api_request, $params: '.var_export($params,true));
+
+			// 1. Basic validations
 		
+			// validating payload data
+			$dataload = $params['gesimatic_dataload'];
+			$signature = $params['gesimatic_signature'];
+			if( ! $this->data_validation($dataload, $signature)){
+				$result = [
+					'success' => false,
+        			'message' => __('Manipulated data','gesimatic-static-forms'),
+				];
+				return new \WP_REST_Response($result, 200);
+			}
+					
+			$data = json_decode($dataload);
+			error_log ('Api->manage_user_register_api_request, $data: '.var_export($data,true));
+
+			// Validating the trap_time
+						if ((time() - $data->trap_time) < 3) {
+				$result = [
+					'success' => false,
+        			'message' => __('Bot detected','gesimatic-static-forms'),
+				];
+				return new \WP_REST_Response($result, 200);
+			}
+
 			// Validating the honeypot
 			if ($params['gesimatic_website'] !== ''){
 				$result = [
@@ -103,10 +128,11 @@ class Api extends Setup {
 				return new \WP_REST_Response($result, 200);
 			}
 
+			// getting form data
 			$username = sanitize_user($params['user_name']);
 			$email = sanitize_email($params['user_email']);
 
-			// 🔐 1. Validaciones básicas
+			// Validating username and email
 			if (empty($username) || empty($email)) {
 				$result = [
 					'success' => false,
@@ -131,32 +157,10 @@ class Api extends Setup {
 				return new \WP_REST_Response($result, 200);
 		    }
 
-			// validating payload data
-			$dataload = $params['gesimatic_dataload'];
-			$signature = $params['gesimatic_signature'];
-			if( ! $this->data_validation($dataload, $signature)){
-				$result = [
-					'success' => false,
-        			'message' => __('Manipulated data','gesimatic-static-forms'),
-				];
-				return new \WP_REST_Response($result, 200);
-			}
-					
-			$data = json_decode($dataload);
-			error_log ('Api->manage_user_register_api_request, $data: '.var_export($data,true));
-			
-			if ((time() - $data['trap_time']) < 3) {
-				$result = [
-					'success' => false,
-        			'message' => __('Bot detected','gesimatic-static-forms'),
-				];
-				return new \WP_REST_Response($result, 200);
-			}
-
-
 
 			// 🔐 2. Obtener rol (desde tu sistema seguro)
-			$role = 'subscriber'; // 👈 aquí debes integrar tu lógica segura
+			$role = $this->get_user_role_from_form($data->post_id, $data->form_id);
+			error_log ('Api->manage_user_register_api_request, $role: '.var_export($role,true));
 
 //			$allowed_roles = ['subscriber', 'customer'];
 /*			$allowed_roles = self::get_allowed_roles();
@@ -229,7 +233,77 @@ class Api extends Setup {
 		} else {return true;}
 	}
 
-    /**
+	/**
+	 * To get role from form in post_id 
+	 */
+	private function get_user_role_from_form($post_id, $form_id){
+		// get post content
+    	$post = get_post( $post_id );
+
+    	if ( ! $post ) {
+        	return '';
+    	}
+
+    	// Parsing Gutenberg blocks
+    	$blocks = parse_blocks( $post->post_content );
+
+    	// Recursively search for the block
+    	$role = $this->find_user_role_in_blocks( $blocks, $form_id );
+
+		// 👇 If the block was not found - abort
+		if ( $role === null ) {
+			return '';
+    }
+
+    return $role;
+	}
+
+	/**
+	 * To get role from block in blocks list
+	 */
+	private function find_user_role_in_blocks($blocks, $form_id){
+
+		foreach ( $blocks as $block ) {
+
+			// Check if it's your block
+			if (
+				isset( $block['blockName'] ) &&
+				$block['blockName'] === 'gesimatic-static-forms/user-register'
+			) {
+
+				$attrs = $block['attrs'] ?? [];
+
+				// Verify form_id
+				if (
+					isset( $attrs['formId'] ) &&
+					$attrs['formId'] == (string) $form_id
+				) {
+
+					// Return role if it exists
+					if ( ! empty( $attrs['userRole'] ) ) {
+						return sanitize_text_field( $attrs['userRole'] );
+					}
+					// Block found but no role - default
+					return 'subscriber';
+				}
+			}
+
+			// Search within internal blocks (very important)
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$result = $this->find_user_role_in_blocks( $block['innerBlocks'], $form_id );
+
+				if ( $result !== null) {
+					return $result;
+				}
+			}
+		}
+		// null means "block not found"
+		return null;
+	}
+	
+	
+	
+	/**
 	 * To initialize the admin Api hooks	  
 	 */
 	public function register_user($result,$params){
