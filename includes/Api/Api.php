@@ -193,21 +193,15 @@ class Api extends Setup {
 
 			update_user_meta($user_id, '_gesimatic_activation_expire', $expire);
 			
-			// Agendamos la limpieza con Action Scheduler
+			// We scheduled the cleaning with Action Scheduler
 			Core::instance()->get_queue()->scheduleSingle(
 				$expire,                    // momento de ejecución
 				'gesimatic_cleanup_user',      // hook
 				[ $user_id ]                   // argumentos
 			);
 			
-			// 🔐 4. Asignar rol
-/*			wp_update_user([
-				'ID'   => $user_id,
-				'role' => $role
-			]);
-
-			// 🔐 5. Generar clave de reset
-/*			$user = get_user_by('id', $user_id);
+			// 5. Generate reset key
+			$user = get_user_by('id', $user_id);
 
 			$reset_key = get_password_reset_key($user);
 
@@ -215,13 +209,13 @@ class Api extends Setup {
 				return $reset_key;
 			}
 
-			// 🔗 6. Crear URL de reset
+			// 6. Create reset URL
 			$reset_url = network_site_url(
 				"wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user->user_login),
 				'login'
 			);
 
-			// 📧 7. Enviar email
+			// 7. Sned email
 			$subject = __('Set your password'.'gesimatic-static-forms');
 
 			$message = "Hello {$user->user_login},\n\n";
@@ -235,7 +229,7 @@ class Api extends Setup {
 				'success' => true,
 				'message' => 'User registered. Check your email.'
 			];
-*/
+
 		}
 
 		error_log ('admin_api_controler, $result: '.var_export($result,true));

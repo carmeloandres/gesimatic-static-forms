@@ -1,5 +1,3 @@
-const startTime = Date.now();
-
 /**
  * Función genérica para enviar datos a la REST API de WordPress
  * @param {FormData} formData - Los datos del formulario capturados
@@ -59,11 +57,6 @@ const gesimaticStaticFormsFormSubmit = async (e) => {
     if (!form.checkValidity()) {
         form.reportValidity(); 
         return;     
-    }
-
-    // time trap
-    if ((Date.now() - startTime) < 2000 ){
-        return
     }
 
     const formData = new FormData(form);
