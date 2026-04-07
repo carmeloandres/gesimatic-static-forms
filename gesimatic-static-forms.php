@@ -6,7 +6,7 @@
  * @since       1.0.0
  * @author      Carmelo Andrés
  * @license     Saas license
- * @copyright   2025 Carmelo Andrés
+ * @copyright   2026 Carmelo Andrés
  * 
  * @wordpress-plugin
  * Plugin Name:         Gesimatic static forms
@@ -142,7 +142,7 @@ function gesimatic_static_forms_new_site_setup($new_site){
 
 }
 
-$Gsmtc_static_forms = new GesimaticStaticForms\Core\Core();
+$gesimatic_static_forms = new GesimaticStaticForms\Core\Core();
 
 
 

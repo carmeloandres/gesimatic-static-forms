@@ -48,12 +48,12 @@ class Core extends Setup {
 
         // To clean the registered but inactive users
         add_action( 'gesimatic_cleanup_user', [ $this, 'cleanup_inactive_user' ] );
-/*
-        // to load the admin assets
-        add_action('admin_enqueue_scripts',[$this,'admin_enqueue_assets'], 10, 1);
+
+        // to load the text domain
+        add_action('plugins_loaded',[$this,'load_text_domain']);
 
         // set the react file gesimatic-admin.js as an ES6 module 
-        add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
+/*        add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
             // If the handle is not from our React script, we return the tag unchanged.
             if ( 'gesimatic-admin-js' !== $handle ) {
                 return $tag;
@@ -70,6 +70,18 @@ class Core extends Setup {
  //       \Gesimatic\Api\Api::init();
         error_log ('Core::construct() executed, $params: ');//.var_export($params,true));
 */
+    }
+
+    /**
+     * Function to load the text domain
+     * @param void
+     */
+    public static function load_text_domain() {
+        load_plugin_textdomain(
+            'gesimatic-static-forms',
+            false,
+            '/gesimatic-static-forms/languages'//Relative path to WP_PLUGIN_DIR where the .mo file resides. 
+        );
     }
 
     /**
