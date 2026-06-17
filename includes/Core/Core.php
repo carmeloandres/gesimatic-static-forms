@@ -2,9 +2,6 @@
 
 namespace GesimaticStaticForms\Core;
 
-// Prevent direct access 
-if ( ! defined( 'ABSPATH' ) ) {exit;} ; 
-
 use GesimaticStaticForms\Core\Setup;
 use GesimaticStaticForms\Blocks\Blocks;
 use GesimaticStaticForms\Api\Api;
@@ -36,8 +33,8 @@ class Core extends Setup {
         parent::__construct();
 
         // Load the Api class if not is loaded
-        if (! isset($this->instances['api']))
-            $this->instances['api'] = new Api();
+//      if (! isset($this->instances['api']))
+//          $this->instances['api'] = new Api();
 
         // Load the Blocks class if not is loaded
         if (! isset($this->instances['blocks']))
@@ -51,6 +48,22 @@ class Core extends Setup {
 
         // to load the text domain
         add_action('plugins_loaded',[$this,'load_text_domain']);
+
+        // to add the staticFormsController to api
+        add_filter('gesimatic_api_controllers', function($controllers){
+            $controllers[] = \GesimaticStaticForms\Api\Controllers\StaticFormsController::class;
+            return $controllers;
+        });
+    
+
+        // to add the static forms to api
+        add_filter('gesimatic_static_forms', function($forms){
+            $forms['user-register'] = [
+                'validate' => [\GesimaticStaticForms\Api\UserRegister::class, 'validate'],
+                'handle' => [\GesimaticStaticForms\Api\UserRegister::class, 'handle']
+            ];
+            return $forms;
+        });
 
         // set the react file gesimatic-admin.js as an ES6 module 
 /*        add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {

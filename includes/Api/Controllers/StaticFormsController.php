@@ -1,6 +1,6 @@
 <?php
 
-namespace GesimaticStaticForms\Api;
+namespace GesimaticStaticForms\Api\Controllers;
 
 use Gesimatic\Api\Middleware\ApiPermissions;
 
@@ -19,6 +19,9 @@ class StaticFormsController {
             'callback' => [$this, 'handle'],
             'permission_callback' => [ApiPermissions::class, 'check'],
         ]);
+
+        error_log ('GesimaticStaticForms->FormsController, register_routes() executed');
+
     }
 
         public function handle(\WP_REST_Request $request) {
@@ -31,9 +34,27 @@ class StaticFormsController {
 */
         // 2. GET PARAMS
         $params = $request->get_params();
-        error_log ('GesimaticStaticForms->FormsController, $params: '.var_export($params,true));
+        error_log ('GesimaticStaticForms->FormsController, handle() $params: '.var_export($params,true));
 
-        
+        // Checks if exists form name
+        if ( ! isset($params['form'])) return $this->error();
+
+       // sanitize action 
+        $form = sanitize_text_field($params['form']);
+
+        // Gets registered actions
+        $static_forms = $this->get_static_forms();
+
+        // checks if it is enabled and validate data
+        if ( ! isset($static_forms[$form])) return $this->error();
+
+        // validate request data
+        $validated = call_user_func($static_forms[$form]['validate'], $params);
+    
+        // handle the request
+        return call_user_func($static_forms[$form]['handle'], $validated );
+
+
 
         // 3. VALIDATE SIGNATURE
         if (!SignatureValidator::validate(
