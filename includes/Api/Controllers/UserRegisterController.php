@@ -76,4 +76,6 @@ class UserRegisterController {
             'message' => 'If valid, check your email'
         ], 200);
     }
+
+
 }
