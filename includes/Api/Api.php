@@ -2,9 +2,6 @@
 
 namespace GesimaticStaticForms\Api;
 
-// Prevent direct access 
-if ( ! defined( 'ABSPATH' ) ) {exit;} ;
-
 use Gesimatic\Core\Core;
 use GesimaticStaticForms\Core\Setup;
 
@@ -162,14 +159,14 @@ class Api extends Setup {
 			// 2. Get role (from your secure system)
 			$role = $this->get_user_role_from_form($data->post_id, $data->form_id);
 			$allowed_roles = self::get_allowed_roles();
-			if (in_array( ! $role, $allowed_roles, true)){
+			if ( ! in_array( $role, $allowed_roles, true)){
 				$result = [
 					'success' => false,
         			'message' => __('Registration not allowed.','gesimatic-static-forms'),
     			];
 				return new \WP_REST_Response($result, 200);
 			}
-			error_log ('Api->manage_user_register_api_request, $role: '.var_export($role,true));
+//			error_log ('Api->manage_user_register_api_request, $role: '.var_export($role,true));
 
 			// 3. Create user WITHOUT a usable password
 

@@ -20,6 +20,7 @@
  * License URI:       	https://www.gesimatic/saas-terms
  * Text Domain:         gesimatic-static-forms
  * Domain Path:         /languages
+ * Requires Plugins:    gesimatic
  */ 
 
 defined( 'ABSPATH' ) || exit; // To prevent direct access
