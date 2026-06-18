@@ -2,8 +2,11 @@
 
 namespace GesimaticStaticForms\Api;
 
-use Gesimatic\Api\Controllers\AdminController;
 use Gesimatic\Api\Base\CommonResponse;
+use Gesimatic\Api\Controllers\AdminController;
+use Gesimatic\Api\Middleware\SinatureValidator;
+use Gesimatic\Api\Middleware\RequestValidator;
+use Gesimatic\Api\Middleware\ResolveRole;
 
 use GesimaticLoginAttempts\Core\Setup;
 
@@ -14,7 +17,7 @@ use GesimaticLoginAttempts\Core\Setup;
  *
  * @package gesimatic-login-attempts
  */
-class UserRegister{
+class UserRegisterAction {
 
     /** 
      * To validate 
@@ -29,16 +32,45 @@ class UserRegister{
         // sets the default value
         $sanitized_params = array();
 
-        return $sanitized_params;
-
         // check if acction is as expected
-        if(isset($params['action']) && ($params['action'] === 'get_login_attempts_pagination')){
-                // validate FilterStatus
-                if(isset($params['filterStatus']) ){
-                    $sanitized_params['filterStatus'] = sanitize_text_field($params['filterStatus']);
-                    if ( ! in_array($sanitized_params['filterStatus'],self::VALID_FILTERS)) return false;
-                }else return false;
-        } else return false;
+        if(isset($params['form']) && ($params['form'] === 'user_register')){
+
+            // Check honeypot
+            if ( ! empty($params['gesimatic_website'])) {
+                return CommonResponse::error();
+            }
+
+            // Validate signature
+            if ( ! SignatureValidator::validate( $params['gesimatic_dataload'] ?? '', $params['gesimatic_signature'] ?? '')) {
+                return CommonResponse::error();
+            }
+
+            // validate json
+             $data = RequestValidator::validate_json($params['gesimatic_dataload']);
+
+            if (!$data) {
+                return CommonResponse::error();
+            }
+
+            // Check trap_time
+            if (isset($data['trap_time']) && ! empty($data['trap_time'])) {
+                $time_diff = time() - intval($data['trap_time']);
+                if ($time_diff < 2) { // Less than 2 seconds
+                    return CommonResponse::error();
+                }
+            }
+
+            // Validate inputs
+            $sanitized_params['username'] = RequestValidator::string($params['user_name'] ?? null);
+            $sanitized_params['email']    = sanitize_email($params['user_email'] ?? '');
+
+            if (!$sanitized_params['username'] || !is_email($sanitized_params['email'])) {
+                return CommonResponse::error();
+            }
+
+            // Get user role from block attributes
+            $sanitized_params['role'] = ResolveRole::get_role($data);
+        }
 
         return $sanitized_params;
     }

@@ -59,8 +59,8 @@ class Core extends Setup {
         // to add the static forms to api
         add_filter('gesimatic_static_forms', function($forms){
             $forms['user-register'] = [
-                'validate' => [\GesimaticStaticForms\Api\UserRegister::class, 'validate'],
-                'handle' => [\GesimaticStaticForms\Api\UserRegister::class, 'handle']
+                'validate' => [\GesimaticStaticForms\Api\UserRegisterAction::class, 'validate'],
+                'handle' => [\GesimaticStaticForms\Api\UserRegisterAction   ::class, 'handle']
             ];
             return $forms;
         });
