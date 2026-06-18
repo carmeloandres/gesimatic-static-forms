@@ -41,7 +41,7 @@ class Core extends Setup {
             $this->instances['blocks'] = new Blocks();
 
         // To set the user role at reset password if proceed
-        add_action('after_pasword_reset',[$this,'delete_user_activation_expires']);
+        add_action('after_password_reset',[$this,'delete_user_activation_expires']);
 
         // To clean the registered but inactive users
         add_action( 'gesimatic_cleanup_user', [ $this, 'cleanup_inactive_user' ] );
@@ -64,6 +64,9 @@ class Core extends Setup {
             ];
             return $forms;
         });
+  
+
+
 
         // set the react file gesimatic-admin.js as an ES6 module 
 /*        add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
@@ -84,6 +87,9 @@ class Core extends Setup {
         error_log ('Core::construct() executed, $params: ');//.var_export($params,true));
 */
     }
+
+
+
 
     /**
      * Function to load the text domain
@@ -123,8 +129,8 @@ class Core extends Setup {
     function delete_user_activation_expires($user){
         // $user → objeto WP_User
         
-        delete_user_meta($user->ID, 'gesimatic_pending_activation');
-        delete_user_meta($user->ID, 'gesimatic_activation_expires');
+        delete_user_meta($user->ID, '_gesimatic_pending_activation');
+        delete_user_meta($user->ID, '_gesimatic_activation_expires');
 
         error_log("User {$user->user_login} has reset their password");
     }

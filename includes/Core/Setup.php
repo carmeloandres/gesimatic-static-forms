@@ -2,9 +2,6 @@
 
 namespace GesimaticStaticForms\Core;
 
-// Prevent direct access 
-if ( ! defined( 'ABSPATH' ) ) {exit;} ; 
-
 /**
  * Class Setup.
  * 

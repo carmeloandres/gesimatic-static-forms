@@ -7,6 +7,7 @@ use Gesimatic\Api\Controllers\AdminController;
 use Gesimatic\Api\Middleware\SinatureValidator;
 use Gesimatic\Api\Middleware\RequestValidator;
 use Gesimatic\Api\Middleware\ResolveRole;
+use Gesimatic\Core\Core;
 
 use GesimaticLoginAttempts\Core\Setup;
 
@@ -69,55 +70,99 @@ class UserRegisterAction {
             }
 
             // Get user role from block attributes
-            $sanitized_params['role'] = ResolveRole::get_role($data);
+            $role = ResolveRole::get_role($data);
+            
+            if (!$role) {
+                return CommonResponse::error();
+            }
+
+            $sanitized_params['role'] = $role;
         }
 
         return $sanitized_params;
     }
 
-       /**
+    /**
      * To handle 
      * 
      * This method perfoms the necesaria actions to handle data, to perform the request.
      * 
      */
-    public static function handle($validated){
+    public static function handle($validated_data){
 
-        error_log ('UserRegister handle, $validated: '.var_export($validated,true));
+        error_log ('UserRegister handle, $validated: '.var_export($validated_data,true));
 
-        $results = array(
-			'items' => 0,
-			'pages' => 0
-		);
+        $user_id = wp_insert_user([
+            'user_login' => $validated_data['username'],
+            'user_email' => $validated_data['email'],
+            'user_pass'  => wp_generate_password(32, true, true),
+            'role'       => $validated_data['role'],
+        ]);
 
-        return new \WP_REST_Response($results, 200);
+        if (is_wp_error($user_id)) return CommonResponse::error();
 
-     if (is_array($validated)){
-        	$filterStatus = '';
-			if ($validated['filterStatus'] != '')
-				if ($validated['filterStatus'] == 'enabled')
-					$filterStatus = " WHERE status = 'enabled' ";
-				else $filterStatus = " WHERE status <> 'enabled' ";
-        
-    $items = $wpdb->get_var( "SELECT COUNT(*) FROM " . self::$table_name_status_ip . " " . $filterStatus );
+        update_user_meta($user_id, '_gesimatic_pending_activation', 'pending');
 
-	        $pages = 0;
-			if (($items != NULL)){
-				$pages = intval($items) / intval(self::$per_page);
-				if ((intval($items) % intval(self::$per_page)) > 0)
-					$pages = intval($pages + 1); 
-				else $pages = intval($pages);
-			}
+        self::schedule_cleanup($user_id);
+        self::send_email($user_id);
 
-			$results = array(
-				'items' => $items,
-				'pages' => $pages
-			);		
+        return CommonResponse::success(['message' => 'User registered successfully.']);
+    }
 
 
-        } else return CommonResponse::error();
+    /**
+     * To schedule cleanup  
+     */
+    public static function schedule_cleanup($user_id) {
 
-        return new \WP_REST_Response($results, 200);
+    		// Time límit (ex: 24h)
+			$expire = time() + DAY_IN_SECONDS;
+
+			update_user_meta($user_id, '_gesimatic_activation_expire', $expire);
+			
+			// We scheduled the cleaning with Action Scheduler
+			Core::instance()->get_queue()->scheduleSingle(
+				$expire,                    // momento de ejecución
+				'gesimatic_cleanup_user',      // hook
+				[ $user_id ]                   // argumentos
+			);
+    }   
+
+    /**
+     * To send email  
+     */
+    public static function send_email($user_id) : bool {
+
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return false;     
+        }
+
+        $key = get_password_reset_key( $user );
+
+        if ( is_wp_error( $key ) ) {
+            return false;
+        }
+
+        $reset_url = network_site_url(
+            'wp-login.php?action=rp&key=' . $key . '&login=' . rawurlencode( $user->user_login ),
+            'login'
+        );
+
+        $subject = __('Set your password', 'gesimatic-static-forms');
+
+        $message = sprintf(
+            __('Hello %s,\n\nClick on the following link to set your password:\n\n%s', 'gesimatic-static-forms'),
+            $user->display_name,
+            $reset_url
+        );
+
+        return wp_mail(
+            $user->user_email,
+            $subject,
+            $message
+        );
+
     }
 
 }

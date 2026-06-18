@@ -19,6 +19,10 @@ class ResolveRole {
             }
         }
 
+        if (in_array($role, \GesimaticStaticForms\Core\Setup::$restricted_roles)) {
+            $role = false;
+        }
+
         return $role;
     }
 
