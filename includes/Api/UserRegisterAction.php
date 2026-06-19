@@ -3,13 +3,15 @@
 namespace GesimaticStaticForms\Api;
 
 use Gesimatic\Api\Base\CommonResponse;
-use Gesimatic\Api\Controllers\AdminController;
-use Gesimatic\Api\Middleware\SinatureValidator;
-use Gesimatic\Api\Middleware\RequestValidator;
-use Gesimatic\Api\Middleware\ResolveRole;
-use Gesimatic\Core\Core;
+//use Gesimatic\Api\Controllers\AdminController;
+//use Gesimatic\Core\Core;
 
-use GesimaticLoginAttempts\Core\Setup;
+use GesimaticStaticForms\Api\Middleware\CredentialValidator;
+use GesimaticStaticForms\Api\Middleware\SignatureValidator;
+use GesimaticStaticForms\Api\Middleware\RequestValidator;
+use GesimaticStaticForms\Api\Middleware\ResolveRole;
+
+//use GesimaticLoginAttempts\Core\Setup;
 
 /**
  * Class Setup
@@ -31,49 +33,54 @@ class UserRegisterAction {
         error_log ('UserRegister validate, $params: '.var_export($params,true));
 
         // sets the default value
-        $sanitized_params = array();
+        $sanitized_params = false;
 
         // check if acction is as expected
-        if(isset($params['form']) && ($params['form'] === 'user_register')){
+        if(isset($params['form']) && ($params['form'] === 'user-register')){
 
+            error_log ('UserRegisterAction validate, $params[gesimatic_website]: '.var_export($params['gesimatic_website'],true));
             // Check honeypot
             if ( ! empty($params['gesimatic_website'])) {
-                return CommonResponse::error();
+                return false; // Honeypot field is filled, likely a bot submission
             }
 
+            error_log ('UserRegisterAction validate, $params[gesimatic_dataload]: '.var_export($params['gesimatic_dataload'],true));
             // Validate signature
             if ( ! SignatureValidator::validate( $params['gesimatic_dataload'] ?? '', $params['gesimatic_signature'] ?? '')) {
-                return CommonResponse::error();
+                return false;
             }
 
             // validate json
              $data = RequestValidator::validate_json($params['gesimatic_dataload']);
 
-            if (!$data) {
-                return CommonResponse::error();
+            error_log ('UserRegisterAction validate, $data: '.var_export($data,true));
+
+             if (!$data) {
+                return false;
             }
 
             // Check trap_time
             if (isset($data['trap_time']) && ! empty($data['trap_time'])) {
                 $time_diff = time() - intval($data['trap_time']);
                 if ($time_diff < 2) { // Less than 2 seconds
-                    return CommonResponse::error();
+                    return  false;
                 }
             }
 
-            // Validate inputs
-            $sanitized_params['username'] = RequestValidator::string($params['user_name'] ?? null);
-            $sanitized_params['email']    = sanitize_email($params['user_email'] ?? '');
-
-            if (!$sanitized_params['username'] || !is_email($sanitized_params['email'])) {
-                return CommonResponse::error();
-            }
+            // Validate credentials
+            $username = sanitize_user($params['user_name'] ?? '');
+            $email = sanitize_email($params['user_email'] ?? '');
+            if ( ! CredentialValidator::validate($username, $email)) {
+                return false;
+            }   
 
             // Get user role from block attributes
             $role = ResolveRole::get_role($data);
-            
+                    
+            error_log ('UserRegisterAction validate, $role: '.var_export($role,true));
+
             if (!$role) {
-                return CommonResponse::error();
+                return false;
             }
 
             $sanitized_params['role'] = $role;
@@ -90,23 +97,28 @@ class UserRegisterAction {
      */
     public static function handle($validated_data){
 
-        error_log ('UserRegister handle, $validated: '.var_export($validated_data,true));
+        error_log ('UserRegisterAction handle, $validated_data: '.var_export($validated_data,true));
 
-        $user_id = wp_insert_user([
-            'user_login' => $validated_data['username'],
-            'user_email' => $validated_data['email'],
-            'user_pass'  => wp_generate_password(32, true, true),
-            'role'       => $validated_data['role'],
-        ]);
+        if (is_array($validated_data) && isset($validated_data['username'], $validated_data['email'], $validated_data['role'])) {
 
-        if (is_wp_error($user_id)) return CommonResponse::error();
+            $user_id = wp_insert_user([
+                'user_login' => $validated_data['username'],
+                'user_email' => $validated_data['email'],
+                'user_pass'  => wp_generate_password(32, true, true),
+                'role'       => $validated_data['role'],
+            ]);
 
-        update_user_meta($user_id, '_gesimatic_pending_activation', 'pending');
+            if (is_wp_error($user_id)) return CommonResponse::error();
 
-        self::schedule_cleanup($user_id);
-        self::send_email($user_id);
+            update_user_meta($user_id, '_gesimatic_pending_activation', 'pending');
 
-        return CommonResponse::success(['message' => 'User registered successfully.']);
+            self::schedule_cleanup($user_id);
+            self::send_email($user_id);
+
+            return CommonResponse::success(['message' => 'User registered successfully.']);
+        } else {
+            return CommonResponse::error();
+        }
     }
 
 

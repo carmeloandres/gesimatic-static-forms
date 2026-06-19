@@ -1,17 +1,11 @@
 /**
- * Función genérica para enviar datos a la REST API de WordPress
- * @param {FormData} formData - Los datos del formulario capturados
- * @param {Object} config - El objeto de configuración (restUrl, nonce, labels)
- * @param {HTMLFormElement} form - Referencia al formulario para feedback visual
+ * Function to send data to the WordPress REST API
+ * @param {FormData} formData - The form data captured
+ * @param {Object} config - The configuration object (restUrl, nonce, labels)
+ * @param {HTMLFormElement} form - Reference to the form for visual feedback
  */
 const gesimaticStaticFormsUserRegisterSend = async (formData, config, form) => {
-    // 1. Mostramos un estado de "Cargando" en el botón
-    const submitButton = form.querySelector('.gesimatic-form__button');
-    const originalButtonText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Enviando...';
 
-    // 2. Convertimos FormData a un objeto simple para el cuerpo del JSON
     const data = Object.fromEntries(formData.entries());
 
     try {
@@ -19,7 +13,7 @@ const gesimaticStaticFormsUserRegisterSend = async (formData, config, form) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-WP-Nonce': config.nonce // Seguridad obligatoria para la REST API
+                'X-WP-Nonce': config.nonce 
             },
             body: JSON.stringify(data)
         });
@@ -28,6 +22,8 @@ const gesimaticStaticFormsUserRegisterSend = async (formData, config, form) => {
 
         console.log ('Api response :',result)
 
+        return result; 
+        /*
         if (response.ok && result.success) {
             // ÉXITO: WordPress respondió con wp_send_json_success
             alert(config.successLabel || 'Usuario registrado con éxito.');
@@ -37,16 +33,20 @@ const gesimaticStaticFormsUserRegisterSend = async (formData, config, form) => {
             const errorMessage = result.data?.message || config.warningLabel || 'Error desconocido';
             alert(`Atención: ${errorMessage}`);
         }
-
+*/
     } catch (error) {
         // FALLO CRÍTICO: El servidor no responde o hay un error de red
         console.error('Error en la petición:', error);
-        alert('Error de conexión con el servidor. Inténtalo más tarde.');
-    } finally {
+//        alert('Error de conexión con el servidor. Inténtalo más tarde.');
+        return { success: false, message: 'Server connection error.' };
+    } 
+    /*
+    finally {
         // 3. Restauramos el botón pase lo que pase
         submitButton.disabled = false;
         submitButton.textContent = originalButtonText;
     }
+        */
 };
 
 const gesimaticStaticFormsFormSubmit = async (e) => {
@@ -63,19 +63,30 @@ const gesimaticStaticFormsFormSubmit = async (e) => {
     console.log ('formData :',Object.fromEntries(formData));
 
     // check validation, this field must be empty
+    /*
     const gesimaticWebsite = formData.get('gesimatic_website').trim();
     if(gesimaticWebsite != ''){
         return;
     }
-
+*/
     const config = JSON.parse(form.dataset.config);
     const notice = form.querySelector('[data-gesimatic="alert"]');
     
     notice.classList.replace('display-none','gesimatic-alert-warning');
     notice.innerHTML = config.warningLabel;
+    // 1. Mostramos un estado de "Cargando" en el botón
+
+    const submitButton = form.querySelector('.gesimatic-form__button');
+    //const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    //submitButton.textContent = 'Enviando...';
     
     
     const result = await gesimaticStaticFormsUserRegisterSend(formData, config, form);
+
+    submitButton.disabled = false;
+    notice.classList.replace('gesimatic-alert-warning','display-none');
+
     // 1. Obtener valores
 /*    const userName = formData.get('user_name').trim();
     const userEmail = formData.get('user_email').trim();
@@ -107,7 +118,7 @@ window.onload = () => {
 //        gesimaticStaticFormsUserRegister = [...gesimaticStaticFormsUserRegister,{formId:{'name':'','email':''}}]
         console.log('config : ', config)
        form.addEventListener('submit',gesimaticStaticFormsFormSubmit);
-       console.log('form submit handler added');      
+//       console.log('form submit handler added');      
     });
 //console.log('gesimaticStaticFormsUserRegister :',gesimaticStaticFormsUserRegister);
 }
