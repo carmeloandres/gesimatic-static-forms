@@ -131,7 +131,7 @@ class Blocks extends Setup{
             >
             <input type="text" name="gesimatic_website" style="display:none">
             <input type="hidden" name="gesimatic_dataload" value="<?php echo esc_attr($dataload); ?>">            
-            <input type="hidden" name="gesimatic_signature" value="<?php echo esc_attr(hash_hmac('sha256',$dataload,AUTH_SALT)); ?>">
+            <input type="hidden" name="gesimatic_signature" value="<?php echo esc_attr(hash_hmac('sha256',$dataload,AUTH_KEY)); ?>">
             <div data-gesimatic="alert" class='gesimatic-alert display-none'></div>
             <button type="submit" class='gesimatic-form__button' style="background-color:<?php echo $atts['elementsColor']; ?>"><?php echo $atts['buttonLabel']; ?></button>
         </form>

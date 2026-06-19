@@ -1,6 +1,6 @@
 <?php
 
-namespace GesimaticStaticForms\Api;
+namespace GesimaticStaticForms\Api\Middleware;
 
 class CredentialValidator {
 

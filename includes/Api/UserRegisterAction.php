@@ -4,7 +4,7 @@ namespace GesimaticStaticForms\Api;
 
 use Gesimatic\Api\Base\CommonResponse;
 //use Gesimatic\Api\Controllers\AdminController;
-//use Gesimatic\Core\Core;
+use Gesimatic\Core\Core;
 
 use GesimaticStaticForms\Api\Middleware\CredentialValidator;
 use GesimaticStaticForms\Api\Middleware\SignatureValidator;
@@ -33,7 +33,7 @@ class UserRegisterAction {
         error_log ('UserRegister validate, $params: '.var_export($params,true));
 
         // sets the default value
-        $sanitized_params = false;
+        $sanitized_params = [];
 
         // check if acction is as expected
         if(isset($params['form']) && ($params['form'] === 'user-register')){
@@ -68,9 +68,9 @@ class UserRegisterAction {
             }
 
             // Validate credentials
-            $username = sanitize_user($params['user_name'] ?? '');
-            $email = sanitize_email($params['user_email'] ?? '');
-            if ( ! CredentialValidator::validate($username, $email)) {
+            $sanitized_params['username'] = sanitize_user($params['user_name'] ?? '');
+            $sanitized_params['email'] = sanitize_email($params['user_email'] ?? '');
+            if ( ! CredentialValidator::validate($sanitized_params['username'], $sanitized_params['email'])) {
                 return false;
             }   
 
@@ -86,7 +86,11 @@ class UserRegisterAction {
             $sanitized_params['role'] = $role;
         }
 
-        return $sanitized_params;
+        if (! empty($sanitized_params)) {
+           return $sanitized_params;
+        } else {
+            return false;
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace GesimaticStaticForms\Api;
+namespace GesimaticStaticForms\Api\Middleware;
 
 class ResolveRole {
 
@@ -10,17 +10,21 @@ class ResolveRole {
 
         $blocks = parse_blocks(get_post($data['post_id'])->post_content);
 
-        $atts = find_block_attrs($blocks,'gesimatic-static-forms/user-register');
+        $atts = self::find_blocks_atts($blocks,'gesimatic-static-forms/user-register');
 
         foreach ($atts as $block_atts) {
             if (isset($block_atts['formId']) && $block_atts['formId'] === $data['form_id']) {
-                $role = $block_atts['userRole'];
+                if(isset($block_atts['userRole']) && !empty($block_atts['userRole'])) {
+                    $role = $block_atts['userRole'];
+                } else {
+                    $role = 'subscriber';
+                }
                 break;
             }
         }
 
         if (in_array($role, \GesimaticStaticForms\Core\Setup::$restricted_roles)) {
-            $role = false;
+            return false;
         }
 
         return $role;
@@ -35,8 +39,8 @@ class ResolveRole {
             }
             if (!empty($block['innerBlocks'])) {
                 $result = self::find_blocks_atts($block['innerBlocks'], $block_name);
-                if ($result !== null) {
-                    return $result;
+                if (! empty($result)) {
+                    $blocks_atts[] = $result;
                 }
             }
         }
