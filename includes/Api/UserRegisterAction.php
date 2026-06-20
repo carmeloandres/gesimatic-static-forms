@@ -67,9 +67,13 @@ class UserRegisterAction {
                 }
             }
 
+            
             // Validate credentials
             $sanitized_params['username'] = sanitize_user($params['user_name'] ?? '');
             $sanitized_params['email'] = sanitize_email($params['user_email'] ?? '');
+            
+            error_log ('UserRegisterAction validate, $sanitized_params: '.var_export($sanitized_params,true));
+
             if ( ! CredentialValidator::validate($sanitized_params['username'], $sanitized_params['email'])) {
                 return false;
             }   
@@ -137,10 +141,10 @@ class UserRegisterAction {
 			update_user_meta($user_id, '_gesimatic_activation_expire', $expire);
 			
 			// We scheduled the cleaning with Action Scheduler
-			Core::instance()->get_queue()->scheduleSingle(
-				$expire,                    // momento de ejecución
-				'gesimatic_cleanup_user',      // hook
-				[ $user_id ]                   // argumentos
+			\Gesimatic\Core\Core::instance()->get_queue()->scheduleSingle(
+				$expire,                    // execution time
+				'gesimatic_cleanup_user',   // hook
+				[ $user_id ]                // arguments
 			);
     }   
 

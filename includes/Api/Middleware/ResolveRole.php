@@ -22,8 +22,11 @@ class ResolveRole {
                 break;
             }
         }
+        $allowed_roles = \GesimaticStaticForms\Core\Setup::get_allowed_roles();
 
-        if (in_array($role, \GesimaticStaticForms\Core\Setup::$restricted_roles)) {
+        error_log ('Resolved role: '.$role.', $allowed_roles: '.var_export($allowed_roles,true));
+
+        if ( ! array_key_exists($role, $allowed_roles)) {
             return false;
         }
 
