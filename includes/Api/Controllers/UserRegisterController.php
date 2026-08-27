@@ -2,7 +2,7 @@
 
 namespace GesimaticStaticForms\Api;
 
-use Gesimatic\Api\Middleware\ApiPermissions;
+use Gesimatic\Api\Permissions\ApiPermissions;
 
 class UserRegisterController {
 

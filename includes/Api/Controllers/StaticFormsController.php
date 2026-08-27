@@ -2,7 +2,7 @@
 
 namespace GesimaticStaticForms\Api\Controllers;
 
-use Gesimatic\Api\Middleware\ApiPermissions;
+use Gesimatic\Api\Permissions\ApiPermissions;
 use Gesimatic\Api\Base\CommonResponse;
 
 /**
